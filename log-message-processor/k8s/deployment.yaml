@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-message-processor
+ 
+  labels:
+    app: log-message-processor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-message-processor
+  template:
+    metadata:
+      labels:
+        app: log-message-processor
+    spec:
+      containers:
+        - image: myregistry:5000/log-message-processor
+          name: log-message-processor
+          ports:
+          - containerPort: 8083
+          env:
+          - name: ZIPKIN_HOST
+            value: lab1
+          - name: ZIPKIN_PORT
+            value: "9411"
+          - name: REDIS_HOST
+            value: lab1
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_CHANNEL
+            value: log_channel
+          - name: ZIPKIN_URL
+            value: http://lab1:9411/api/v1/spans
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      imagePullSecrets:
+      - name: dockerhub-image-pull-secret

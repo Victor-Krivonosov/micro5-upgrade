@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-api
+ 
+  labels:
+    app: users-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-api
+  template:
+    metadata:
+      labels:
+        app: users-api
+    spec:
+      containers:
+        - image: myregistry:5000/users-api
+          name: users-api
+          ports:
+          - containerPort: 8083
+          env:
+          - name: JWT_SECRET
+            value: myfancysecret
+          - name: SERVER_PORT
+            value: "8083"
+          - name: ZIPKIN_HOST
+            value: lab1
+          - name: ZIPKIN_PORT
+            value: "9411"
+          - name: SPRING_ZIPKIN_BASE_URL
+            value: http://lab1:9411
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      imagePullSecrets:
+      - name: dockerhub-image-pull-secret
+
